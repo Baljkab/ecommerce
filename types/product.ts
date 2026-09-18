@@ -5,5 +5,12 @@ export type Product = {
     price: number;
     imageUrl: string;
     category: string;
-    size?: Record<string, number>;
+};
+
+export type CartItemData = {
+    id: number;
+    name: string;
+    price: number;
+    imageUrl: string;
+    quantity: number;
 };
