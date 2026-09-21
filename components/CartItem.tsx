@@ -9,9 +9,11 @@ type CartItemProps = {
     quantity: number;
   };
   onRemove: (id: number) => void;
+  onIncrease: (id: number) => void;
+  onDecrease: (id: number) => void;
 };
 
-export default function CartItem({ item, onRemove }: CartItemProps) {
+export default function CartItem({ item, onRemove, onIncrease, onDecrease }: CartItemProps) {
   return (
     <div className="flex gap-4 border-b border-slate-200 py-4">
       <div className="relative h-20 w-20 rounded-lg bg-slate-100">
@@ -25,9 +27,28 @@ export default function CartItem({ item, onRemove }: CartItemProps) {
       </div>
       <div className="min-w-0 flex-1">
         <p className="font-medium">{item.name}</p>
-        <p className="mt-1 text-sm text-slate-500">
-          Тоо ширхэг: {item.quantity}
-        </p>
+        <div>
+          <button 
+            type="button"
+            onClick={()=> onDecrease(item.id)}
+            disabled={item.quantity === 1}
+            className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-lg text-slate-700 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
+            aria-label={'${item.name} Бараа хасах'}
+          >
+            -
+          </button>
+          <span className="min-w-24 text-center text-sm text-slate-500">
+            Тоо ширхэг: {item.quantity}
+          </span>
+          <button
+            type="button"
+            onClick={()=> onIncrease(item.id)}
+            className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-lg text-slate-700 hover:bg-slate-200"
+            aria-label={`${item.name} барааны тоо нэмэх`}
+          >
+            +
+          </button>
+        </div>
         <p className="mt-2 font-semibold text-orange-500">
           Үнэ: {(item.price * item.quantity).toLocaleString("mn-MN")}₮
         </p>

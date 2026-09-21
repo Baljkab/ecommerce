@@ -63,7 +63,7 @@ export default async function ProductsDetailPage({ params }: ProductPageProps) {
                 {product.description}
               </p>
             </div>
-            <ProductPurchase price={product.price} />
+            <ProductPurchase product={product} />
           </div>
         </div>
       </section>

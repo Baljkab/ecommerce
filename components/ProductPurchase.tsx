@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useCart } from "@/components/CartProvider";
+import type { Product } from "@/types/product";
 
 type ProductPurchaseProps = {
-  price: number;
+  product: Product;
 };
 
-export default function ProductPurchase({ price }: ProductPurchaseProps) {
+export default function ProductPurchase({ product }: ProductPurchaseProps) {
   const [quantity, setQuantity] = useState(1);
-  const totalPrice = price * quantity;
+  const { addToCart } = useCart();
+  const [isAdded, setIsAdded] = useState(false);
+  const totalPrice = product.price * quantity;
+
 
   function increaseQuantity() {
     setQuantity((currentQuantity) => currentQuantity + 1);
@@ -16,6 +21,20 @@ export default function ProductPurchase({ price }: ProductPurchaseProps) {
 
   function decreaseQuantity() {
     setQuantity((currentQuantity) => Math.max(1, currentQuantity - 1));
+  }
+
+  function handleAddToCart() {
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      imageUrl: product.imageUrl,
+      quantity,
+    });
+    setIsAdded(true);
+    window.setTimeout(() => {
+      setIsAdded(false);
+    }, 2000);
   }
 
   return (
@@ -56,9 +75,10 @@ export default function ProductPurchase({ price }: ProductPurchaseProps) {
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <button
           type="button"
+          onClick={handleAddToCart}
           className="rounded-full bg-slate-100 px-6 py-4 font-bold text-slate-800 transition-colors hover:bg-slate-200"
         >
-          Сагслах
+          {isAdded ? "Сагсанд нэмэгдлээ" : "Сагсанд нэмэх"}
         </button>
         <button
           type="button"
