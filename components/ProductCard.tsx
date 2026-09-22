@@ -1,3 +1,5 @@
+"use client";
+
 import type { Product } from "@/types/product";
 import Link from "next/link";
 import Image from "next/image";
@@ -20,11 +22,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
       <div className="p-4">
         <h2 className="text-lg font-bold">{product.name}</h2>
-        <p className="mt-2 text-xs leading-5 text-slate-600">
+        <p className="mt-2 line-clamp-4 text-xs leading-5 text-slate-600">
           {product.description}
         </p>
         <p className="mt-3 text-base font-bold text-orange-600">
           Үнэ: {product.price.toLocaleString("mn-MN")}₮
+        </p>
+        <p className="mt-1 text-xs font-medium text-emerald-600">
+          Үлдэгдэл: {product.stock} ширхэг
         </p>
         <Link
           href={`/products/${product.id}`}

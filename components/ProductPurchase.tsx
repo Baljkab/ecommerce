@@ -13,8 +13,6 @@ export default function ProductPurchase({ product }: ProductPurchaseProps) {
   const { addToCart } = useCart();
   const [isAdded, setIsAdded] = useState(false);
   const totalPrice = product.price * quantity;
-
-
   function increaseQuantity() {
     setQuantity((currentQuantity) => currentQuantity + 1);
   }
@@ -30,6 +28,7 @@ export default function ProductPurchase({ product }: ProductPurchaseProps) {
       price: product.price,
       imageUrl: product.imageUrl,
       quantity,
+      stock: product.stock,
     });
     setIsAdded(true);
     window.setTimeout(() => {
@@ -63,20 +62,22 @@ export default function ProductPurchase({ product }: ProductPurchaseProps) {
           <button
             type="button"
             onClick={increaseQuantity}
-            className="px-5 py-3 text-lg text-slate-600 transition-colors hover:text-orange-600"
+            className="px-5 py-3 text-lg text-slate-600 transition-colors hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Тоо ширхэг нэмэх"
           >
             +
           </button>
         </div>
-        <span className="text-sm italic text-slate-400">Үлдэгдэлтэй</span>
+        <span className="text-sm font-medium text-emerald-600">
+          Үлдэгдэл: {product.stock} ширхэг
+        </span>
       </div>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2">
         <button
           type="button"
           onClick={handleAddToCart}
-          className="rounded-full bg-slate-100 px-6 py-4 font-bold text-slate-800 transition-colors hover:bg-slate-200"
+          className="rounded-full bg-slate-100 px-6 py-4 font-bold text-slate-800 transition-colors hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isAdded ? "Сагсанд нэмэгдлээ" : "Сагсанд нэмэх"}
         </button>

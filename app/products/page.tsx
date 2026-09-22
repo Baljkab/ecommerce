@@ -1,16 +1,24 @@
 import ProductCard from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import { getProducts } from "@/lib/products";
 import Link from "next/link";
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const products = await getProducts();
   const collections = [
     {
       name: "Зөөврийн компьютер",
       href: "/collections/laptop",
+      categorySlug: "laptop",
     },
     {
       name: "Gaming PC",
       href: "/collections/gaming-pc",
+      categorySlug: "gaming-pc",
+    },
+    {
+      name: "Gaming mouse",
+      href: "/collections/mouse",
+      categorySlug: "mouse",
     },
   ];
 
@@ -19,9 +27,7 @@ export default function ProductsPage() {
       <section className="mx-auto w-full max-w-7xl">
         {collections.map((collection) => {
           const collectionProducts = products.filter((product) =>
-            collection.name === "Gaming PC"
-              ? product.category === "Суурин компьютер"
-              : product.category === collection.name,
+            product.categorySlug === collection.categorySlug,
           );
 
           return (

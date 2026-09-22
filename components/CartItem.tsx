@@ -7,6 +7,7 @@ type CartItemProps = {
     price: number;
     imageUrl: string;
     quantity: number;
+    stock: number;
   };
   onRemove: (id: number) => void;
   onIncrease: (id: number) => void;
@@ -43,7 +44,7 @@ export default function CartItem({ item, onRemove, onIncrease, onDecrease }: Car
           <button
             type="button"
             onClick={()=> onIncrease(item.id)}
-            className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-lg text-slate-700 hover:bg-slate-200"
+            className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-lg text-slate-700 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label={`${item.name} барааны тоо нэмэх`}
           >
             +
@@ -51,6 +52,9 @@ export default function CartItem({ item, onRemove, onIncrease, onDecrease }: Car
         </div>
         <p className="mt-2 font-semibold text-orange-500">
           Үнэ: {(item.price * item.quantity).toLocaleString("mn-MN")}₮
+        </p>
+        <p className="mt-1 text-xs text-emerald-600">
+          Үлдэгдэл: {item.stock} ширхэг
         </p>
       </div>
 

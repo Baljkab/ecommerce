@@ -17,7 +17,7 @@ type CartContextType = {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const cartStorageKey = "cart";
+const cartStorageKey = "cart-display-stock-v4";
 const cartListeners = new Set<() => void>();
 
 function subscribeToCart(listener: () => void) {
@@ -57,7 +57,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   function increaseQuantity(id: number) {
     saveCart(
       items.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
+        item.id === id
+          ? {
+              ...item,
+              quantity: item.quantity + 1,
+            }
+          : item,
       ),
     );
   }
@@ -65,7 +70,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   function decreaseQuantity(id: number) {
     saveCart(
       items.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
+        item.id === id
+          ? {
+              ...item,
+              quantity: Math.max(1, item.quantity - 1),
+            }
+          : item,
       ),
     );
   }
@@ -74,14 +84,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const existingItem = items.find((item) => item.id === newItem.id);
 
     if (!existingItem) {
-      saveCart([...items, newItem]);
+      saveCart([
+        ...items,
+        {
+          ...newItem,
+        },
+      ]);
       return;
     }
 
     saveCart(
       items.map((item) =>
         item.id === newItem.id
-          ? { ...item, quantity: item.quantity + newItem.quantity }
+          ? {
+              ...item,
+              quantity: item.quantity + newItem.quantity,
+            }
           : item,
       ),
     );
