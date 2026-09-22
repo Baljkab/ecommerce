@@ -10,7 +10,7 @@ type ProductCardProps = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   return (
-    <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-md shadow-orange-100">
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-md shadow-orange-100">
       <div className="relative h-44 w-full bg-white">
         <Image
           src={product.imageUrl}
@@ -20,23 +20,25 @@ export default function ProductCard({ product }: ProductCardProps) {
           sizes="(max-width: 640px) 200vw, (max-width: 1024px) 50vw, 530vw"
         />
       </div>
-      <div className="p-4">
+      <div className="flex flex-1 flex-col p-4">
         <h2 className="text-lg font-bold">{product.name}</h2>
-        <p className="mt-2 line-clamp-4 text-xs leading-5 text-slate-600">
+        <p className="mt-2 h-20 line-clamp-4 text-xs leading-5 text-slate-600">
           {product.description}
         </p>
-        <p className="mt-3 text-base font-bold text-orange-600">
-          Үнэ: {product.price.toLocaleString("mn-MN")}₮
-        </p>
-        <p className="mt-1 text-xs font-medium text-emerald-600">
-          Үлдэгдэл: {product.stock} ширхэг
-        </p>
-        <Link
-          href={`/products/${product.id}`}
-          className="mt-3 inline-block rounded-full bg-orange-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-lg shadow-orange-400/20 transition-all hover:-translate-y-1 hover:bg-orange-300 hover:shadow-orange-400/40"
-        >
-          Дэлэгрэнгүй мэдээлэл
-        </Link>
+        <div className="mt-auto pt-3">
+          <p className="text-base font-bold text-orange-600">
+            Үнэ: {product.price.toLocaleString("mn-MN")}₮
+          </p>
+          <p className="mt-1 text-xs font-medium text-emerald-600">
+            Үлдэгдэл: {product.stock} ширхэг
+          </p>
+          <Link
+            href={`/products/${product.id}`}
+            className="mt-3 inline-block rounded-full bg-orange-400 px-4 py-2 text-xs font-bold text-slate-950 shadow-lg shadow-orange-400/20 transition-all hover:-translate-y-1 hover:bg-orange-300 hover:shadow-orange-400/40"
+          >
+            Дэлгэрэнгүй мэдээлэл
+          </Link>
+        </div>
       </div>
     </article>
   );

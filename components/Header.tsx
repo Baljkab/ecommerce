@@ -21,37 +21,46 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav
-          aria-label="Үндсэн цэс"
-          className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1"
-        >
-          <Link
-            href="/"
-            className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
+        <div className="flex items-center gap-2">
+          <nav
+            aria-label="Үндсэн цэс"
+            className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1"
           >
-            Нүүр
-          </Link>
-          <Link
-            href="/products"
-            className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
-          >
-            Бүтээгдэхүүн
-          </Link>
-          <div className="group relative">
             <Link
-              href="/cart"
+              href="/"
               className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
             >
-              Сагс
-              {totalQuantity > 0 && (
-                <span className="ml-2 rounded-full bg-orange-500 px-2 py-1 text-xs text-white">
-                  {totalQuantity}
-                </span>
-              )}
+              Нүүр
             </Link>
-            <CartPreview />
-          </div>
-        </nav>
+            <Link
+              href="/products"
+              className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
+            >
+              Бүтээгдэхүүн
+            </Link>
+            <div className="group relative">
+              <Link
+                href="/cart"
+                className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
+              >
+                Сагс
+                {totalQuantity > 0 && (
+                  <span className="ml-2 rounded-full bg-orange-500 px-2 py-1 text-xs text-white">
+                    {totalQuantity}
+                  </span>
+                )}
+              </Link>
+              <CartPreview />
+            </div>
+          </nav>
+
+          <Link
+            href="/login"
+            className="rounded-full bg-orange-500 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-600"
+          >
+            Нэвтрэх
+          </Link>
+        </div>
       </div>
     </header>
   );
