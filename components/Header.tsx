@@ -1,19 +1,65 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useCart } from "@/components/CartProvider";
+import { getSupabaseClient } from "@/lib/supabase";
 import CartPreview from "./CartPreview";
 
 export default function Header() {
   const { totalQuantity } = useCart();
+  const [userName, setUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = getSupabaseClient();
+
+    const updateUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const currentUser = session?.user;
+      const nextName =
+        currentUser?.user_metadata?.full_name ??
+        currentUser?.email?.split("@")[0] ??
+        null;
+
+      setUserName(nextName);
+    };
+
+    updateUser();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const currentUser = session?.user;
+      const nextName =
+        currentUser?.user_metadata?.full_name ??
+        currentUser?.email?.split("@")[0] ??
+        null;
+
+      setUserName(nextName);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    const supabase = getSupabaseClient();
+    await supabase.auth.signOut();
+    setUserName(null);
+  };
+
   return (
-    <header className="border-oronge-600 bg-orenge-500 sticky top-0 z-50 border-b text-slate-900 shadow-sm backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6">
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link
           href="/"
           className="group flex items-center gap-3 text-xl font-bold tracking-wide text-slate-900"
         >
-          <span className="shadow-oronge-600transition-transform flex h-9 w-9 items-center justify-center rounded-lg bg-orange-400 text-sm font-black text-slate-950 shadow-lg duration-300 group-hover:rotate-6">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-sm font-black text-white shadow-lg shadow-orange-500/30 transition-transform duration-300 group-hover:rotate-6">
             E
           </span>
           <span className="transition-colors group-hover:text-orange-600">
@@ -21,10 +67,10 @@ export default function Header() {
           </span>
         </Link>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <nav
             aria-label="Үндсэн цэс"
-            className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1"
+            className="hidden items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1 md:flex"
           >
             <Link
               href="/"
@@ -45,7 +91,7 @@ export default function Header() {
               >
                 Сагс
                 {totalQuantity > 0 && (
-                  <span className="ml-2 rounded-full bg-orange-500 px-2 py-1 text-xs text-white">
+                  <span className="ml-2 rounded-full bg-orange-500 px-2 py-1 text-xs font-bold text-white">
                     {totalQuantity}
                   </span>
                 )}
@@ -54,12 +100,32 @@ export default function Header() {
             </div>
           </nav>
 
-          <Link
-            href="/login"
-            className="rounded-full bg-orange-500 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-600"
-          >
-            Нэвтрэх
-          </Link>
+          {userName ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/profile"
+                className="hidden rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 sm:block"
+              >
+                {userName}
+              </Link>
+              <Link href="/">
+                <button
+                type="button"
+                onClick={handleSignOut}
+                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-orange-600"
+              >
+                Гарах
+              </button>
+              </Link>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center rounded-full bg-orange-500 px-4 py-2 text-sm font-bold text-white shadow-lg shadow-orange-500/20 transition-all hover:-translate-y-0.5 hover:bg-orange-600"
+            >
+              Нэвтрэх
+            </Link>
+          )}
         </div>
       </div>
     </header>
