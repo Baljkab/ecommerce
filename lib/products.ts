@@ -19,6 +19,26 @@ type ProductRow = {
 
 export type Category = CategoryRow;
 
+// Supabase дахь туршилтын тайлбарыг засах хүртэл ашиглах тайлбар.
+// Үзүүлэлт: https://www.razer.com/ap-en/gaming-mice/razer-viper-v4-pro?page=tech-specs
+const viperV4ProDescription =
+  "Razer Viper V4 Pro — өрсөлдөөнт тоглоомд зориулсан хөнгөн, утасгүй хулгана. " +
+  "Focus Pro 50K Gen-3 оптик мэдрэгч, 50,000 DPI хүртэлх мэдрэмж, " +
+  "утастай болон утасгүй горимд 8,000 Hz хүртэлх мэдээлэл дамжуулах давтамжтай. " +
+  "HyperSpeed Wireless Gen-2 холболт, Gen-4 оптик товчлуур, программчлах боломжтой " +
+  "6 товчтой. Батарей нь 1,000 Hz тохиргоонд 180 цаг, 8,000 Hz тохиргоонд " +
+  "45 цаг хүртэл ажиллана. Хэмжээ: 127.1 × 63.9 × 39.9 мм. RGB гэрэлтүүлэггүй.";
+
+function getProductDescription(product: ProductRow): string {
+  const name = product.name.trim().replace(/\s+/g, " ").toLowerCase();
+
+  if (name === "razer viper v4 pro") {
+    return viperV4ProDescription;
+  }
+
+  return product.description;
+}
+
 function mapProduct(
   product: ProductRow,
   category: CategoryRow | undefined,
@@ -26,7 +46,7 @@ function mapProduct(
   return {
     id: product.id,
     name: product.name,
-    description: product.description,
+    description: getProductDescription(product),
     price: product.price,
     imageUrl: product.image_url,
     stock: product.stock,

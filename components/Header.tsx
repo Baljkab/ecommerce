@@ -1,14 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import { getSupabaseClient } from "@/lib/supabase";
-import CartPreview from "./CartPreview";
+import CartPreview from "@/components/CartPreview";
 
 export default function Header() {
   const { totalQuantity } = useCart();
   const [userName, setUserName] = useState<string | null>(null);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState("");
+  const accountRef = useRef<HTMLDivElement>(null);
+  const accountButtonRef = useRef<HTMLButtonElement>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!accountOpen) return;
+
+    const handleOutsideClick = (event: PointerEvent) => {
+      if (
+        event.target instanceof Node &&
+        !accountRef.current?.contains(event.target)
+      ) {
+        setAccountOpen(false);
+      }
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setAccountOpen(false);
+        accountButtonRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", handleOutsideClick);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("pointerdown", handleOutsideClick);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [accountOpen]);
 
   useEffect(() => {
     const supabase = getSupabaseClient();
@@ -32,6 +65,7 @@ export default function Header() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAccountOpen(false);
       const currentUser = session?.user;
       const nextName =
         currentUser?.user_metadata?.full_name ??
@@ -47,14 +81,26 @@ export default function Header() {
   }, []);
 
   const handleSignOut = async () => {
-    const supabase = getSupabaseClient();
-    await supabase.auth.signOut();
-    setUserName(null);
+    setSigningOut(true);
+    setSignOutError("");
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUserName(null);
+      setAccountOpen(false);
+      router.push("/");
+      router.refresh();
+    } catch {
+      setSignOutError("Гарах үед алдаа гарлаа. Дахин оролдоно уу.");
+    } finally {
+      setSigningOut(false);
+    }
   };
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link
           href="/"
           className="group flex items-center gap-3 text-xl font-bold tracking-wide text-slate-900"
@@ -70,24 +116,24 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <nav
             aria-label="Үндсэн цэс"
-            className="hidden items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1 md:flex"
+            className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1"
           >
             <Link
               href="/"
-              className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
+              className="hidden rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600 md:block"
             >
               Нүүр
             </Link>
             <Link
               href="/products"
-              className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
+              className="hidden rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600 md:block"
             >
               Бүтээгдэхүүн
             </Link>
             <div className="group relative">
               <Link
                 href="/cart"
-                className="rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
+                className="inline-flex items-center rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
               >
                 Сагс
                 {totalQuantity > 0 && (
@@ -101,22 +147,59 @@ export default function Header() {
           </nav>
 
           {userName ? (
-            <div className="flex items-center gap-2">
-              <Link
-                href="/profile"
-                className="hidden rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 sm:block"
-              >
-                {userName}
-              </Link>
-              <Link href="/">
-                <button
+            <div
+              ref={accountRef}
+              className="relative"
+              onBlur={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget)) {
+                  setAccountOpen(false);
+                }
+              }}
+            >
+              <button
+                ref={accountButtonRef}
                 type="button"
-                onClick={handleSignOut}
-                className="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-orange-600"
+                aria-expanded={accountOpen}
+                aria-controls="account-actions"
+                onClick={() => setAccountOpen((open) => !open)}
+                className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
               >
-                Гарах
+                <span className="max-w-32 truncate">{userName}</span>
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  className={`h-4 w-4 transition-transform ${accountOpen ? "rotate-180" : ""}`}
+                >
+                  <path
+                    d="m5 7.5 5 5 5-5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
               </button>
-              </Link>
+              {accountOpen && (
+                <div
+                  id="account-actions"
+                  className="absolute top-full right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
+                >
+                  <button
+                    type="button"
+                    disabled={signingOut}
+                    onClick={handleSignOut}
+                    className="w-full rounded-lg bg-slate-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {signingOut ? "Гарч байна..." : "Гарах"}
+                  </button>
+                  {signOutError && (
+                    <p role="alert" className="mt-2 text-xs text-red-600">
+                      {signOutError}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           ) : (
             <Link

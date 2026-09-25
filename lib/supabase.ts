@@ -1,6 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+let browserClient: SupabaseClient | undefined;
 
 export function getSupabaseClient() {
+  if (typeof window !== "undefined" && browserClient) return browserClient;
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -10,5 +14,7 @@ export function getSupabaseClient() {
     );
   }
 
-  return createClient(supabaseUrl, supabaseAnonKey);
+  const client = createClient(supabaseUrl, supabaseAnonKey);
+  if (typeof window !== "undefined") browserClient = client;
+  return client;
 }
