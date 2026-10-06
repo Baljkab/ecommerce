@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
@@ -21,6 +21,7 @@ export default function CheckoutPage() {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const submitLock = useRef(false);
 
   useEffect(() => {
     async function loadProfile() {
@@ -51,7 +52,8 @@ export default function CheckoutPage() {
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
-    if (!userId) return;
+    if (!userId || submitLock.current) return;
+    submitLock.current = true;
 
     setSubmitting(true);
     setError("");
@@ -63,9 +65,16 @@ export default function CheckoutPage() {
         { province, district, khoroo, addressDetail, phoneNumber, email },
         items,
       );
-      await clearCart();
+      // The order is already committed; cart cleanup must not create a retry.
+      try {
+        await clearCart();
+      } catch {
+        /* Show the confirmed order regardless. */
+      }
       router.push(`/orders/${orderId}`);
     } catch (err) {
+      submitLock.current = false;
+      setSubmitting(false);
       setError(
         err instanceof Error ? err.message : "Захиалга өгөхөд алдаа гарлаа.",
       );
@@ -156,7 +165,10 @@ export default function CheckoutPage() {
           </label>
 
           {error && (
-            <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-700">
+            <p
+              role="alert"
+              className="rounded-xl bg-red-50 p-3 text-sm text-red-700"
+            >
               {error}
             </p>
           )}
