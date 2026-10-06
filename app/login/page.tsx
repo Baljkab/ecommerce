@@ -19,7 +19,7 @@ export default function LoginPage() {
 
     try {
       const supabase = getSupabaseClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -28,7 +28,20 @@ export default function LoginPage() {
         throw signInError;
       }
 
-      router.push("/profile");
+      const userId = data.user?.id;
+      const { data: profile, error: profileError } = userId
+        ? await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", userId)
+            .single()
+        : { data: null, error: null };
+
+      if (profileError) {
+        console.error("Профайл татахад алдаа гарлаа:", profileError);
+      }
+
+      router.push(profile?.role === "admin" ? "/admin" : "/");
       router.refresh();
     } catch (err) {
       setError(

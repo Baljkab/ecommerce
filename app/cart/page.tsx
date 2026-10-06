@@ -87,13 +87,12 @@ export default function CartPage() {
             Үргэлжлүүлэн үзэх
           </Link>
 
-          <button
-            type="button"
-            disabled
-            className="cursor-not-allowed rounded-full bg-orange-500 px-6 py-3 font-bold text-white opacity-50"
+          <Link
+            href="/checkout"
+            className="rounded-full bg-orange-500 px-6 py-3 font-bold text-white transition-colors hover:bg-orange-600"
           >
             Захиалга өгөх
-          </button>
+          </Link>
         </div>
         <p className="mt-3 text-sm text-slate-500">
           Захиалга өгөх боломж удахгүй нээгдэнэ.

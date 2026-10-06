@@ -31,6 +31,7 @@ export default async function ProductsDetailPage({ params }: ProductPageProps) {
         <div className="grid min-h-[calc(100vh-88px)] md:grid-cols-2">
           <div className="relative min-h-[420px] bg-white sm:min-h-[560px]">
             <Image
+              id={`product-image-${product.id}`}
               src={product.imageUrl}
               alt={product.name}
               fill

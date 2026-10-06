@@ -10,7 +10,7 @@ type ProductCardProps = {
 
 export default function ProductCard({ product }: ProductCardProps) {
   return (
-    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-md shadow-orange-100">
+    <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-900 shadow-md shadow-orange-100 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-orange-200/70">
       <div className="relative h-44 w-full bg-white">
         <Image
           src={product.imageUrl}

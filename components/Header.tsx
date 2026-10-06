@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/components/CartProvider";
 import { getSupabaseClient } from "@/lib/supabase";
 import CartPreview from "@/components/CartPreview";
+import CollectionNav from "@/components/CollectionNav";
+import ProductSearch from "@/components/ProductSearch";
 
 export default function Header() {
   const { totalQuantity } = useCart();
@@ -100,10 +102,11 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-4 px-4 py-4 sm:px-6">
+        <CollectionNav />
         <Link
           href="/"
-          className="group flex items-center gap-3 text-xl font-bold tracking-wide text-slate-900"
+          className="group flex shrink-0 items-center gap-3 text-xl font-bold tracking-wide text-slate-900"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 text-sm font-black text-white shadow-lg shadow-orange-500/30 transition-transform duration-300 group-hover:rotate-6">
             E
@@ -112,8 +115,12 @@ export default function Header() {
             TechStore
           </span>
         </Link>
+        <div className="order-last min-w-0 basis-full lg:order-none lg:flex-1 lg:basis-0">
+  <ProductSearch />
+</div>
 
-        <div className="flex items-center gap-3">
+
+        <div className="ml-auto flex shrink-0 items-center gap-3">
           <nav
             aria-label="Үндсэн цэс"
             className="flex items-center gap-1 rounded-full border border-slate-200 bg-slate-50 p-1"
@@ -133,11 +140,26 @@ export default function Header() {
             <div className="group relative">
               <Link
                 href="/cart"
-                className="inline-flex items-center rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
+                id="cart-icon-target"
+                className="inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium text-slate-600 transition-all hover:bg-white hover:text-orange-600"
               >
+                <svg
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="h-5 w-5"
+                >
+                  <path
+                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.436m0 0 1.823 7.29a1.125 1.125 0 0 0 1.091.864h9.516a1.125 1.125 0 0 0 1.091-.864l1.329-5.315a.75.75 0 0 0-.728-.933H5.106m0 0L4.5 4.5M7.5 20.25a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Zm10.5 0a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
                 Сагс
                 {totalQuantity > 0 && (
-                  <span className="ml-2 rounded-full bg-orange-500 px-2 py-1 text-xs font-bold text-white">
+                  <span className="ml-0.5 rounded-full bg-orange-500 px-2 py-1 text-xs font-bold text-white">
                     {totalQuantity}
                   </span>
                 )}
@@ -185,6 +207,50 @@ export default function Header() {
                   id="account-actions"
                   className="absolute top-full right-0 mt-2 w-44 rounded-xl border border-slate-200 bg-white p-2 shadow-lg"
                 >
+                  <div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setAccountOpen(false)}
+                      className="mb-1 flex w-full items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-orange-50 hover:text-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-500"
+                    >
+                      <svg
+                        aria-hidden="true"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        className="h-4 w-4"
+                      >
+                        <path
+                          d="M20 21a8 8 0 0 0-16 0M12 13a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+                          stroke="currentColor"
+                          strokeWidth="1.7"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      Профайл
+                    </Link>
+                  </div>
+
+                  <Link
+                    href="/about"
+                    onClick={() => setAccountOpen(false)}
+                    className="mb-1 flex w-full items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-orange-50 hover:text-orange-600"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      className="h-4 w-4"
+                    >
+                      <path
+                        d="M12 11.25a3.75 3.75 0 1 0 0-7.5 3.75 3.75 0 0 0 0 7.5ZM4.5 21a7.5 7.5 0 0 1 15 0"
+                        stroke="currentColor"
+                        strokeWidth="1.7"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    Бидний тухай
+                  </Link>
                   <button
                     type="button"
                     disabled={signingOut}

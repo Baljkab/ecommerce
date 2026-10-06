@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import CartStatus from "@/components/CartStatus";
+import { dispatchFlyToCart } from "@/lib/flyToCart";
 import type { Product } from "@/types/product";
 
 type ProductPurchaseProps = {
@@ -27,6 +28,17 @@ export default function ProductPurchase({ product }: ProductPurchaseProps) {
 
   async function handleAddToCart() {
     setIsAdded(false);
+
+    const imageElement = document.getElementById(
+      `product-image-${product.id}`,
+    );
+    if (imageElement) {
+      dispatchFlyToCart({
+        imageUrl: product.imageUrl,
+        fromRect: imageElement.getBoundingClientRect(),
+      });
+    }
+
     const saved = await addToCart({
       id: product.id,
       name: product.name,

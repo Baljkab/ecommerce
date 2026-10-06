@@ -3,6 +3,8 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/components/CartProvider";
+import AdminRouteGuard from "@/components/AdminRouteGuard";
+import FlyToCartLayer from "@/components/FlyToCartLayer";
 
 export const metadata: Metadata = {
   title: "TechStore | Цахим дэлгүүр",
@@ -15,8 +17,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <CartProvider>
           <Header />
-          {children}
+          <AdminRouteGuard>{children}</AdminRouteGuard>
           <Footer />
+          <FlyToCartLayer />
         </CartProvider>
       </body>
     </html>
