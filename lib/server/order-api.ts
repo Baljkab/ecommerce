@@ -2,7 +2,14 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 type OrderInput = {
   requestId: string;
-  address: Record<string, string>;
+  address: {
+    province: string;
+    district: string;
+    khoroo: string;
+    addressDetail: string;
+    phoneNumber: number;
+    email: string;
+  };
   items: { product_id: number; quantity: number }[];
 };
 
@@ -22,20 +29,34 @@ export function parseOrderInput(value: unknown): OrderInput {
   }
   if (!isRecord(value.address))
     throw new Error("Хүргэлтийн мэдээллээ бөглөнө үү.");
-  const address: Record<string, string> = {};
-  for (const field of [
-    "province",
-    "district",
-    "khoroo",
-    "addressDetail",
-    "phoneNumber",
-    "email",
-  ]) {
-    const entry = value.address[field];
+  const rawAddress = value.address;
+
+  function readAddressText(field: string) {
+    const entry = rawAddress[field];
     if (typeof entry !== "string" || !entry.trim() || entry.length > 1000)
       throw new Error("Хүргэлтийн мэдээлэл дутуу эсвэл хэт урт байна.");
-    address[field] = entry.trim();
+    return entry.trim();
   }
+
+  const phoneNumber = rawAddress.phoneNumber;
+  if (
+    typeof phoneNumber !== "number" ||
+    !Number.isSafeInteger(phoneNumber) ||
+    phoneNumber < 10_000_000 ||
+    phoneNumber > 99_999_999
+  ) {
+    throw new Error("Утасны дугаарыг 8 оронтой тоогоор оруулна уу.");
+  }
+
+  const address = {
+    province: readAddressText("province"),
+    district: readAddressText("district"),
+    khoroo: readAddressText("khoroo"),
+    addressDetail: readAddressText("addressDetail"),
+    phoneNumber,
+    email: readAddressText("email"),
+  };
+
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address.email))
     throw new Error("Имэйл хаягаа зөв оруулна уу.");
   if (

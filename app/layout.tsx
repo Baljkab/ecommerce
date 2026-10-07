@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="mn">
-      <body className="flex min-h-full flex-col">
+      <body className="flex min-h-screen flex-col">
         <CartProvider>
           <Header />
           <AdminRouteGuard>{children}</AdminRouteGuard>

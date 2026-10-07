@@ -1,4 +1,12 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname === "/login" || pathname === "/signup") return null;
+
   return (
     <footer className="mt-auto border-t border-slate-200 bg-white text-slate-600">
       <div className="mx-auto grid max-w-7xl gap-8 px-6 py-10 sm:grid-cols-2 sm:items-center">

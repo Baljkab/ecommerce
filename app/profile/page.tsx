@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSupabaseClient } from "@/lib/supabase";
 import ProfileSidebar from "@/components/ProfileSidebar";
+import { motion } from "motion/react";
 
 type ProfileData = {
   fullName: string;
@@ -18,7 +19,6 @@ export default function ProfilePage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const [lastName, setLastName] = useState("");
   const [firstName, setFirstName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
 
@@ -72,14 +72,19 @@ export default function ProfilePage() {
     event.preventDefault();
     if (!userId) return;
 
-    setSaving(true);
     setSaveError("");
     setSaved(false);
+    if (!/^\d{8}$/.test(phoneNumber)) {
+      setSaveError("Утасны дугаарыг 8 оронтой цифрээр оруулна уу.");
+      return;
+    }
+
+    setSaving(true);
     try {
       const supabase = getSupabaseClient();
       const { error } = await supabase
         .from("profiles")
-        .update({ full_name: firstName, phone_number: phoneNumber })
+        .update({ full_name: firstName, phone_number: Number(phoneNumber) })
         .eq("id", userId);
       if (error) throw error;
 
@@ -112,6 +117,21 @@ export default function ProfilePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+      {saved && (
+        <motion.div
+          role="status"
+          aria-live="polite"
+          initial={{ opacity: 0, y: -12, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          className="fixed top-5 right-5 z-50 flex items-center gap-3 rounded-xl border border-emerald-200 bg-white px-5 py-4 text-sm font-semibold text-emerald-700 shadow-lg"
+        >
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100">
+            ✓
+          </span>
+          Амжилттай хадгалагдлаа
+        </motion.div>
+      )}
+
       <nav
         aria-label="Хөндлөн зам"
         className="flex items-center gap-2 text-sm text-slate-400"
@@ -132,10 +152,11 @@ export default function ProfilePage() {
           </h1>
 
           <form
+            noValidate
             onSubmit={handleSave}
             className="mt-8 grid gap-6 sm:grid-cols-2"
           >
-             <div>
+            <div>
               <label
                 htmlFor="firstName"
                 className="text-sm font-medium text-slate-700"
@@ -161,13 +182,26 @@ export default function ProfilePage() {
               <input
                 id="phoneNumber"
                 type="tel"
+                inputMode="numeric"
+                required
+                minLength={8}
+                maxLength={8}
+                pattern="[0-9]{8}"
+                placeholder="99112233"
                 value={phoneNumber}
-                onChange={(event) => setPhoneNumber(event.target.value)}
+                onChange={(event) =>
+                  setPhoneNumber(
+                    event.target.value.replace(/\D/g, "").slice(0, 8),
+                  )
+                }
                 className="mt-2 w-full rounded-full border border-slate-200 px-5 py-3 text-slate-900 focus:border-orange-400 focus:outline-none"
               />
+              {saveError && (
+                <p role="alert" className="mt-2 text-sm text-red-600">
+                  {saveError}
+                </p>
+              )}
             </div>
-
-           
 
             <div>
               <label
@@ -197,11 +231,6 @@ export default function ProfilePage() {
                     ? "Хадгалагдлаа"
                     : "Хадгалах"}
               </button>
-              {saveError && (
-                <p role="alert" className="mt-2 text-sm text-red-600">
-                  {saveError}
-                </p>
-              )}
             </div>
 
             <div className="text-center sm:col-span-2">

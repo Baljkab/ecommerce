@@ -55,11 +55,11 @@ export default function AdminRouteGuard({ children }: { children: ReactNode }) {
 
   if (blocked) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
+      <main className="flex flex-1 items-center justify-center">
         <p className="text-slate-500">Шилжүүлж байна...</p>
       </main>
     );
   }
 
-  return <>{children}</>;
+  return <div className="flex-1">{children}</div>;
 }

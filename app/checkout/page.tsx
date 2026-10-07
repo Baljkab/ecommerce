@@ -16,7 +16,7 @@ export default function CheckoutPage() {
   const [district, setDistrict] = useState("");
   const [khoroo, setKhoroo] = useState("");
   const [addressDetail, setAddressDetail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<number | "">("");
   const [email, setEmail] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
@@ -44,7 +44,12 @@ export default function CheckoutPage() {
         .eq("id", session.user.id)
         .single();
 
-      if (profile?.phone_number) setPhoneNumber(profile.phone_number);
+      if (
+        typeof profile?.phone_number === "number" &&
+        Number.isSafeInteger(profile.phone_number)
+      ) {
+        setPhoneNumber(profile.phone_number);
+      }
     }
 
     void loadProfile();
@@ -53,6 +58,15 @@ export default function CheckoutPage() {
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     if (!userId || submitLock.current) return;
+    if (
+      phoneNumber === "" ||
+      !Number.isSafeInteger(phoneNumber) ||
+      phoneNumber < 10_000_000 ||
+      phoneNumber > 99_999_999
+    ) {
+      setError("Утасны дугаарыг 8 оронтой тоогоор оруулна уу.");
+      return;
+    }
     submitLock.current = true;
 
     setSubmitting(true);
@@ -147,8 +161,15 @@ export default function CheckoutPage() {
             <input
               required
               type="tel"
+              inputMode="numeric"
+              maxLength={8}
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              onChange={(event) => {
+                const digits = event.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, 8);
+                setPhoneNumber(digits ? Number(digits) : "");
+              }}
               className="mt-1 w-full rounded-xl border border-slate-200 px-4 py-2.5 outline-none focus:border-orange-400"
             />
           </label>

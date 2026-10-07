@@ -45,6 +45,8 @@ export default function ProductForm({
   );
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [formError, setFormError] = useState("");
+  const [priceError, setPriceError] = useState("");
 
   function update<K extends keyof ProductFormValues>(key: K, value: string) {
     setValues((current) => ({ ...current, [key]: value }));
@@ -71,6 +73,20 @@ export default function ProductForm({
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    setFormError("");
+
+    const price = Number(values.price);
+    if (!Number.isSafeInteger(price) || price < 1 || price > 100000000) {
+      setPriceError("1-100'000'000 хооронд үний дүн оруулна уу.");
+      return;
+    }
+    setPriceError("");
+
+    if (!values.imageUrl.trim()) {
+      setFormError("Барааны зураг оруулна уу.");
+      return;
+    }
+
     await onSubmit({
       name: values.name.trim(),
       description: values.description.trim(),
@@ -114,11 +130,18 @@ export default function ProductForm({
         <input
           required
           type="number"
-          min={0}
           value={values.price}
-          onChange={(event) => update("price", event.target.value)}
+          onChange={(event) => {
+            update("price", event.target.value);
+            setPriceError("");
+          }}
           className="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 outline-none focus:border-orange-400"
         />
+        {priceError && (
+          <p role="alert" className="mt-1 text-xs text-red-600">
+            {priceError}
+          </p>
+        )}
       </label>
 
       <label className="text-sm font-medium text-slate-700">
@@ -144,6 +167,11 @@ export default function ProductForm({
               className="h-16 w-16 rounded-xl border border-slate-200 object-cover"
             />
           )}
+          {formError && (
+            <p role="alert" className="mt-1 text-xs text-red-600">
+              {formError}
+            </p>
+          )}
           <div>
             <input
               type="file"
@@ -153,9 +181,7 @@ export default function ProductForm({
               className="block text-sm text-slate-600 file:mr-3 file:rounded-full file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-slate-700 hover:file:bg-slate-200"
             />
             {uploading && (
-              <p className="mt-1 text-xs text-slate-500">
-                Байршуулж байна...
-              </p>
+              <p className="mt-1 text-xs text-slate-500">Байршуулж байна...</p>
             )}
             {uploadError && (
               <p role="alert" className="mt-1 text-xs text-red-600">

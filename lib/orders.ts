@@ -6,7 +6,7 @@ export type ShippingAddress = {
   district: string; // дүүрэг/сум
   khoroo: string; // хороо
   addressDetail: string; // дэлгэрэнгүй хаяг
-  phoneNumber: string;
+  phoneNumber: number;
   email: string;
 };
 

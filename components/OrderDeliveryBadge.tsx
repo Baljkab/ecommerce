@@ -13,8 +13,9 @@ export default function OrderDeliveryBadge({
 }) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${colors[status]}`}
+      className={`inline-flex shrink-0 items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-bold ring-1 ring-inset ${colors[status]}`}
     >
+      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
       {deliveryStatuses[status]}
     </span>
   );

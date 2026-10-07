@@ -17,61 +17,85 @@ export default function CartItem({
   onDecrease,
 }: CartItemProps) {
   return (
-    <div className="flex gap-4 border-b border-slate-200 py-4">
-      <div className="relative h-20 w-20 shrink-0 rounded-lg bg-slate-100">
+    <article className="relative flex flex-col gap-4 border-b border-slate-100 py-5 last:border-b-0 sm:flex-row sm:items-center sm:gap-5">
+      <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-slate-100 bg-gradient-to-br from-slate-50 to-orange-50/60 sm:h-28 sm:w-28">
         <Image
           src={item.imageUrl}
           alt={item.name}
           fill
-          className="rounded-lg object-contain p-2"
-          sizes="80px"
+          className="object-contain p-3"
+          sizes="112px"
         />
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="font-medium text-slate-900">{item.name}</p>
-        <p className="mt-1 text-sm text-slate-500">
-          Нэгж үнэ: {item.price.toLocaleString("mn-MN")}₮
-        </p>
-        <div className="mt-3 flex items-center gap-3">
+
+      <div className="flex min-w-0 flex-1 flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="min-w-0">
+          <h3 className="pr-10 text-base font-bold text-slate-900 sm:pr-0">
+            {item.name}
+          </h3>
+          <p className="mt-1 text-sm text-slate-500">
+            Нэгж үнэ: {item.price.toLocaleString("mn-MN")}₮
+          </p>
+
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center rounded-xl border border-slate-200 bg-white p-1 shadow-sm">
+              <button
+                type="button"
+                onClick={() => onDecrease(item.id)}
+                disabled={disabled || item.quantity <= 1}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-lg text-slate-600 transition-colors hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label={`${item.name} барааны тоог хасах`}
+              >
+                −
+              </button>
+              <span className="min-w-9 text-center text-sm font-bold tabular-nums text-slate-800">
+                {item.quantity}
+              </span>
+              <button
+                type="button"
+                onClick={() => onIncrease(item.id)}
+                disabled={disabled || item.quantity >= item.stock}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-lg text-slate-600 transition-colors hover:bg-orange-50 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label={`${item.name} барааны тоог нэмэх`}
+              >
+                +
+              </button>
+            </div>
+            <p className="text-xs font-medium text-emerald-600">
+              Үлдэгдэл: {item.stock} ширхэг
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-4 sm:flex-col sm:items-end">
+          <p className="text-base font-black text-slate-900 sm:text-right">
+            {(item.price * item.quantity).toLocaleString("mn-MN")}₮
+          </p>
           <button
             type="button"
-            onClick={() => onDecrease(item.id)}
-            disabled={disabled || item.quantity <= 1}
-            className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-lg text-slate-700 hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-40"
-            aria-label={`${item.name} барааны тоог хасах`}
+            onClick={() => onRemove(item.id)}
+            disabled={disabled}
+            className="inline-flex h-9 items-center gap-2 rounded-full px-3 text-xs font-semibold text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-wait disabled:opacity-40"
+            aria-label={`${item.name} барааг сагснаас устгах`}
           >
-            −
-          </button>
-          <span className="min-w-8 text-center text-sm font-medium text-slate-700">
-            {item.quantity}
-          </span>
-          <button
-            type="button"
-            onClick={() => onIncrease(item.id)}
-            disabled={disabled || item.quantity >= item.stock}
-            className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-lg text-slate-700 hover:bg-slate-200 disabled:cursor-wait disabled:opacity-40"
-            aria-label={`${item.name} барааны тоог нэмэх`}
-          >
-            +
+            <svg
+              aria-hidden="true"
+              viewBox="0 0 20 20"
+              fill="none"
+              className="h-4 w-4"
+            >
+              <path
+                d="M4.5 6h11m-9.5 0 .5 10h7l.5-10M8 6V4h4v2m-3 3v4m2-4v4"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Устгах
           </button>
         </div>
-        <p className="mt-3 font-semibold text-orange-500">
-          Дүн: {(item.price * item.quantity).toLocaleString("mn-MN")}₮
-        </p>
-        <p className="mt-1 text-xs text-emerald-600">
-          Үлдэгдэл: {item.stock} ширхэг
-        </p>
       </div>
-
-      <button
-        type="button"
-        onClick={() => onRemove(item.id)}
-        disabled={disabled}
-        className="flex h-8 w-8 shrink-0 items-center justify-center self-center rounded-full text-xl text-slate-500 hover:bg-red-50 hover:text-red-500 disabled:cursor-wait disabled:opacity-40"
-        aria-label={`${item.name} барааг сагснаас устгах`}
-      >
-        ×
-      </button>
-    </div>
+    </article>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createProduct,
   deleteProduct,
@@ -21,6 +21,8 @@ export default function AdminProductsPage() {
   const [busy, setBusy] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFormKey, setEditFormKey] = useState(0);
+  const editFormRef = useRef<HTMLDivElement>(null);
 
   async function loadData() {
     setLoading(true);
@@ -46,6 +48,14 @@ export default function AdminProductsPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadData();
   }, []);
+
+  useEffect(() => {
+    if (editingId === null) return;
+    editFormRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, [editingId, editFormKey]);
 
   async function handleCreate(input: ProductInput) {
     setBusy(true);
@@ -140,11 +150,15 @@ export default function AdminProductsPage() {
       )}
 
       {editingProduct && (
-        <div className="mt-6 rounded-2xl border border-orange-200 bg-orange-50/40 p-6">
+        <div
+          ref={editFormRef}
+          className="mt-6 scroll-mt-24 rounded-2xl border border-orange-200 bg-orange-50/40 p-6"
+        >
           <h2 className="font-bold text-slate-900">
             &quot;{editingProduct.name}&quot; засах
           </h2>
           <ProductForm
+            key={`${editingProduct.id}-${editFormKey}`}
             categories={categories}
             submitLabel="Хадгалах"
             busy={busy}
@@ -207,6 +221,7 @@ export default function AdminProductsPage() {
                     onClick={() => {
                       setShowAddForm(false);
                       setEditingId(product.id);
+                      setEditFormKey((key) => key + 1);
                     }}
                     className="mr-3 font-semibold text-orange-600 hover:underline"
                   >

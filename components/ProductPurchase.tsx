@@ -1,11 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "motion/react";
 import { useCart } from "@/components/CartProvider";
 import CartStatus from "@/components/CartStatus";
 import { dispatchFlyToCart } from "@/lib/flyToCart";
 import type { Product } from "@/types/product";
+
+function AnimateNumber({ value }: { value: number }) {
+  const motionValue = useMotionValue(value);
+  const roundedValue = useTransform(motionValue, (latest) =>
+    Math.round(latest).toLocaleString("mn-MN"),
+  );
+
+  useEffect(() => {
+    const animation = animate(motionValue, value, {
+      duration: 0.35,
+      ease: "easeOut",
+    });
+    return () => animation.stop();
+  }, [motionValue, value]);
+
+  return (
+    <motion.span className="inline-block tabular-nums">
+      {roundedValue}
+    </motion.span>
+  );
+}
 
 type ProductPurchaseProps = {
   product: Product;
@@ -59,32 +86,36 @@ export default function ProductPurchase({ product }: ProductPurchaseProps) {
       <div className="mt-6 border-b border-slate-200 py-4">
         <p className="text-sm text-slate-500 italic">Үнэ:</p>
         <p className="mt-2 text-4xl font-black tracking-tight text-slate-900">
-          {totalPrice.toLocaleString("mn-MN")}₮
+          <AnimateNumber value={totalPrice} />₮
         </p>
         <p className="mt-2 text-sm text-slate-400 italic">(НӨАТ ороогүй дүн)</p>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-4 border-b border-slate-200 pb-6">
         <div className="flex items-center rounded-xl bg-slate-100">
-          <button
+          <motion.button
             type="button"
             onClick={decreaseQuantity}
             disabled={quantity <= 1}
+            whileTap={{ scale: 0.9 }}
             className="px-5 py-3 text-lg text-slate-600 transition-colors hover:text-orange-500 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Тоо ширхэг хасах"
           >
             −
-          </button>
-          <span className="min-w-8 text-center text-slate-800">{quantity}</span>
-          <button
+          </motion.button>
+          <span className="min-w-8 text-center text-slate-800">
+            <AnimateNumber value={quantity} />
+          </span>
+          <motion.button
             type="button"
             onClick={increaseQuantity}
             disabled={quantity >= product.stock}
+            whileTap={{ scale: 0.9 }}
             className="px-5 py-3 text-lg text-slate-600 transition-colors hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-40"
             aria-label="Тоо ширхэг нэмэх"
           >
             +
-          </button>
+          </motion.button>
         </div>
         <span className="text-sm font-medium text-emerald-600">
           Үлдэгдэл: {product.stock} ширхэг
